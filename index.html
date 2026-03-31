@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mikesell Water Supply — Admin Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <path d="M14 2C14 2 5 11 5 17a9 9 0 0018 0C23 11 14 2 14 2z" fill="url(#wg)" opacity="0.9"/>
+          <path d="M14 8C14 8 9 14 9 17a5 5 0 0010 0C19 14 14 8 14 8z" fill="white" opacity="0.25"/>
+          <defs><linearGradient id="wg" x1="14" y1="2" x2="14" y2="26" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#60B8FF"/><stop offset="1" stop-color="#1565C0"/>
+          </linearGradient></defs>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">Mikesell</span>
+        <span class="brand-sub">Water Supply</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <button class="nav-item active" onclick="switchTab('dashboard')" id="nav-dashboard">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </button>
+      <button class="nav-item" onclick="switchTab('connections')" id="nav-connections">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+        Connections
+      </button>
+      <button class="nav-item" onclick="switchTab('monthly')" id="nav-monthly">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Monthly Records
+      </button>
+      <button class="nav-item" onclick="switchTab('billing')" id="nav-billing">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Billing
+      </button>
+      <button class="nav-item" onclick="switchTab('due')" id="nav-due">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Current Due
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sync-status" id="sync-status">
+        <span class="sync-dot" id="sync-dot"></span>
+        <span id="sync-label">Not connected</span>
+      </div>
+    </div>
+  </aside>
+
+  <header class="mobile-header">
+    <button class="menu-btn" onclick="toggleSidebar()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <span class="mobile-brand">Mikesell Water Supply</span>
+    <div></div>
+  </header>
+
+  <main class="main" id="main">
+
+    <div class="setup-banner" id="setup-banner" style="display:none">
+      <div class="setup-inner">
+        <div class="setup-icon">🔗</div>
+        <div class="setup-text">
+          <h3>Connect Your Database</h3>
+          <p>Paste your Firebase Realtime Database URL to enable live data sync.</p>
+        </div>
+        <div class="setup-input-row">
+          <input id="firebase-url-input" class="setup-input" placeholder="https://your-project-default-rtdb.firebaseio.com" />
+          <button class="btn btn-white" onclick="saveFirebaseUrl()">Connect</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- DASHBOARD TAB -->
+    <div class="tab-pane active" id="tab-dashboard">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Dashboard</h1>
+          <p class="page-sub" id="today-date"></p>
+        </div>
+        <button class="btn btn-primary" onclick="openAddModal()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Connection
+        </button>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card stat-blue">
+          <div class="stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></div>
+          <div class="stat-info"><div class="stat-value" id="s-total">—</div><div class="stat-label">Total Connections</div></div>
+        </div>
+        <div class="stat-card stat-amber">
+          <div class="stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+          <div class="stat-info"><div class="stat-value" id="s-due">—</div><div class="stat-label">Pending Payment</div></div>
+        </div>
+        <div class="stat-card stat-green">
+          <div class="stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div>
+          <div class="stat-info"><div class="stat-value" id="s-revenue">—</div><div class="stat-label">Total Outstanding</div></div>
+        </div>
+        <div class="stat-card stat-teal">
+          <div class="stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 00-6.88 17.25"/><path d="M12 2a10 10 0 016.88 17.25"/><path d="M12 7v5l3 3"/></svg></div>
+          <div class="stat-info"><div class="stat-value" id="s-avg">—</div><div class="stat-label">Avg Consumption (m³)</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Recent Connections</span>
+          <button class="btn btn-ghost btn-sm" onclick="switchTab('connections')">View all →</button>
+        </div>
+        <div id="dashboard-table-wrap"><div class="loading"><div class="spinner"></div><span>Loading...</span></div></div>
+      </div>
+    </div>
+
+    <!-- CONNECTIONS TAB -->
+    <div class="tab-pane" id="tab-connections">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Connections</h1>
+          <p class="page-sub">All water meter connections</p>
+        </div>
+        <button class="btn btn-primary" onclick="openAddModal()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Connection
+        </button>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <input class="search-input" id="search-input" placeholder="Search meter name..." oninput="renderConnections()" />
+          <div class="header-actions">
+            <select class="filter-select" id="status-filter" onchange="renderConnections()">
+              <option value="">All Status</option>
+              <option value="due">Due</option>
+              <option value="partial">Partial</option>
+              <option value="paid">Paid</option>
+            </select>
+          </div>
+        </div>
+        <div id="connections-wrap"><div class="loading"><div class="spinner"></div><span>Loading...</span></div></div>
+      </div>
+    </div>
+
+    <!-- MONTHLY RECORDS TAB -->
+    <div class="tab-pane" id="tab-monthly">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Monthly Records</h1>
+          <p class="page-sub">All billing records with payment tracking — pay per month, view any receipt</p>
+        </div>
+        <div class="month-picker-wrap">
+          <label class="month-picker-label">Select Month</label>
+          <select class="month-selector" id="month-selector" onchange="setMonthFilter(this.value)">
+            <option>Loading...</option>
+          </select>
+        </div>
+      </div>
+      <div id="monthly-wrap"><div class="loading"><div class="spinner"></div><span>Loading...</span></div></div>
+    </div>
+
+    <!-- BILLING TAB -->
+    <div class="tab-pane" id="tab-billing">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Billing</h1>
+          <p class="page-sub">Current billing overview for all connections</p>
+        </div>
+        <button class="btn btn-ghost" onclick="printAll()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          Print All
+        </button>
+      </div>
+      <div class="billing-grid" id="billing-grid"></div>
+    </div>
+
+    <!-- DUE TAB -->
+    <div class="tab-pane" id="tab-due">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Current Due</h1>
+          <p class="page-sub">Outstanding balances — remaining amounts after partial payments</p>
+        </div>
+      </div>
+      <div class="due-grid" id="due-grid"></div>
+    </div>
+
+  </main>
+
+  <!-- ADD/EDIT MODAL -->
+  <div class="modal-overlay" id="modal-add">
+    <div class="modal">
+      <div class="modal-head">
+        <h3 id="modal-title">Add Connection</h3>
+        <button class="modal-close" onclick="closeModal('modal-add')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Meter Name</label>
+          <input class="form-input" id="f-name" placeholder="e.g. House 12 – Santos" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Previous Reading (m³)</label>
+            <input class="form-input" type="number" id="f-prev" placeholder="0" min="0" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Present Reading (m³)</label>
+            <input class="form-input" type="number" id="f-present" placeholder="0" min="0" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Rate per m³ (₱)</label>
+            <input class="form-input" type="number" id="f-rate" value="25" min="0" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Due Date</label>
+            <input class="form-input" type="date" id="f-due" />
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('modal-add')">Cancel</button>
+        <button class="btn btn-primary" id="save-btn" onclick="saveConnection()">Save Connection</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- UPDATE READING MODAL -->
+  <div class="modal-overlay" id="modal-reading">
+    <div class="modal">
+      <div class="modal-head">
+        <h3>New Monthly Reading</h3>
+        <button class="modal-close" onclick="closeModal('modal-reading')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="info-box">
+          <span class="info-box-icon">🔒</span>
+          <div>
+            <strong>Smart Billing</strong> — Current bill is archived to history. A new bill is created with paidAmount reset to ₱0.
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Meter Name</label>
+          <input class="form-input" id="r-name" disabled />
+        </div>
+        <div class="locked-bill-display" id="r-current-bill"></div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Previous Reading (m³)</label>
+            <input class="form-input" id="r-prev" disabled />
+          </div>
+          <div class="form-group">
+            <label class="form-label">New Present Reading (m³)</label>
+            <input class="form-input" type="number" id="r-present" placeholder="Enter new reading" min="0" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Rate per m³ this month (₱)</label>
+            <input class="form-input" type="number" id="r-rate" placeholder="25" min="0" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">New Due Date</label>
+            <input class="form-input" type="date" id="r-due" />
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('modal-reading')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveReading()">Save New Reading</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAY MODAL -->
+  <div class="modal-overlay" id="modal-pay">
+    <div class="modal">
+      <div class="modal-head">
+        <h3>Record Payment</h3>
+        <button class="modal-close" onclick="closeModal('modal-pay')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="pay-summary">
+          <div class="pay-summary-name" id="pay-meter-name">—</div>
+          <div class="pay-summary-month" id="pay-month">—</div>
+          <div class="pay-summary-grid">
+            <div class="pay-summary-item">
+              <span class="pay-summary-label">Total Bill</span>
+              <span class="pay-summary-value" id="pay-total">—</span>
+            </div>
+            <div class="pay-summary-item">
+              <span class="pay-summary-label">Already Paid</span>
+              <span class="pay-summary-value paid" id="pay-already-paid">—</span>
+            </div>
+            <div class="pay-summary-item pay-summary-item--highlight">
+              <span class="pay-summary-label">Remaining Balance</span>
+              <span class="pay-summary-value remaining" id="pay-remaining">—</span>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Payment Amount (₱)</label>
+          <input class="form-input form-input--large" type="number" id="pay-amount-input" min="0.01" step="0.01" placeholder="Enter amount" />
+          <span class="form-hint">Enter the full or partial amount received.</span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('modal-pay')">Cancel</button>
+        <button class="btn btn-pay-confirm" id="pay-save-btn" onclick="savePayment()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          Confirm Payment
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RECEIPT MODAL -->
+  <div class="modal-overlay" id="modal-receipt">
+    <div class="modal modal-wide">
+      <div class="modal-head">
+        <h3>Water Bill Receipt</h3>
+        <button class="modal-close" onclick="closeModal('modal-receipt')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body" id="receipt-content"></div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('modal-receipt')">Close</button>
+        <button class="btn btn-primary" onclick="printCurrentReceipt()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          Print Receipt
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- HISTORY MODAL -->
+  <div class="modal-overlay" id="modal-history">
+    <div class="modal modal-wide">
+      <div class="modal-head">
+        <h3>Billing History</h3>
+        <button class="modal-close" onclick="closeModal('modal-history')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body" id="history-content"></div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('modal-history')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
