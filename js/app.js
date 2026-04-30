@@ -926,3 +926,12 @@ if (storedUrl) {
     `<div class="empty"><div class="empty-icon">🔗</div><div class="empty-title">Connect Firebase</div><div class="empty-sub">Enter your Firebase URL above to get started</div></div>`;
   setSyncStatus('error', 'Not connected');
 }
+
+// PWA Service Worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/mikesell-water/sw.js')
+      .then(() => console.log('SW registered'))
+      .catch(e => console.log('SW error:', e));
+  });
+}
